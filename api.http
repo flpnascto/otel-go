@@ -1,8 +1,9 @@
 
-# Microservice Climate GET Request if cep param
+### Microservice Climate GET Request if cep param
 GET http://localhost:8080/01001000
 
-# Microservice Input POST Request if cep body(JSON)
+
+### Microservice Input POST Request if cep body(JSON)
 POST http://localhost:8081/input
 content-type: application/json
 
