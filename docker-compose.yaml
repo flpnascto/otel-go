@@ -52,3 +52,20 @@ services:
       - ./goapp:/go/src/app
     ports:
       - "8080:8080"
+
+  goinput:
+    container_name: goinput
+    build: ./goinput
+    environment:
+      - OTEL_SERVICE_NAME=microservice-input
+      - REQUEST_NAME_OTEL=microservice-input-request
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+      - EXTERNAL_CALL_URL=http://goapp:8080
+      - HTTP_PORT=:8081
+    depends_on:
+      - jaeger-all-in-one
+      - otel-collector
+    volumes:
+      - ./goinput:/go/src/app
+    ports:
+      - "8081:8081"
