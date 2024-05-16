@@ -23,6 +23,15 @@ services:
     ports:
       - "9090:9090"
 
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
   otel-collector:
     image: otel/opentelemetry-collector:latest
     restart: always
