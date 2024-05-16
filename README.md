@@ -33,6 +33,7 @@ Para executar a aplicação siga as instruções abaixo.
 
 Primeiramente é necessário que possua instalado as seguintes ferramentas: Go, Git, Docker.
 Além disto é bom ter um editor para trabalhar com o código como VSCode.
+Cadastro na [API WeatherAPI](https://www.weatherapi.com/)
 
 ### Instalação
 
@@ -43,7 +44,10 @@ Além disto é bom ter um editor para trabalhar com o código como VSCode.
    ```sh
    git clone git@github.com:flpnascto/otel-go.git
    ```
-2. Acessar a pasta do repositório local e inicie o docker para instanciar as aplicações
+2. Acessar a pasta do repositório local configurar variáveis de ambiente
+   - No arquivo `./goapp/.env_example` adicionar a API KEY de WeatherAPI para **WEATHER_API_KEY**
+   - Alterar o nome deste arquivo de `.env_example` para `.env`
+3. Acessar a pasta do repositório local e inicie o docker para instanciar as aplicações
   ```sh
    docker compose up -d
    ```
