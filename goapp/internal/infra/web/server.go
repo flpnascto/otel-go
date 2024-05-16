@@ -16,6 +16,13 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+type HandlerResponse struct {
+	City  string  `json:"city"`
+	TempC float32 `json:"temp_C"`
+	TempF float32 `json:"temp_F"`
+	TempK float32 `json:"temp_K"`
+}
+
 type TemplateData struct {
 	RequestNameOTEL string
 	OTELTracer      trace.Tracer
@@ -76,11 +83,11 @@ func (h *Webserver) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	spanWeatherApi.End()
 
-	response := map[string]any{
-		"city":   city,
-		"temp_C": temp.TempC,
-		"temp_F": temp.TempF,
-		"temp_K": temp.TempK,
+	response := HandlerResponse{
+		City:  *city,
+		TempC: temp.TempC,
+		TempF: temp.TempF,
+		TempK: temp.TempK,
 	}
 
 	err = json.NewEncoder(w).Encode(response)
