@@ -1,6 +1,0 @@
-POST http://localhost:8081/input
-content-type: application/json
-
-{
-    "cep": "30350220"
-}
