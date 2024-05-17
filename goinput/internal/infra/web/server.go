@@ -2,10 +2,11 @@ package web
 
 import (
 	"encoding/json"
-	"fmt"
+	"io"
 	"net/http"
 	"time"
 
+	"github.com/flpnascto/otel-go/goinput/internal/entity"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -64,13 +65,19 @@ func (h *Webserver) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	err := json.NewDecoder(r.Body).Decode(&cepBody)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("invalid request body: %v", err), http.StatusBadRequest)
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	cep, err := entity.NewCep(cepBody.Cep)
+	if err != nil {
+		http.Error(w, "invalid zipcode", http.StatusUnprocessableEntity)
 		return
 	}
 
 	var req *http.Request
 
-	req, err = http.NewRequestWithContext(ctx, http.MethodGet, h.TemplateData.ExternalCallURL+"/"+cepBody.Cep, nil)
+	req, err = http.NewRequestWithContext(ctx, http.MethodGet, h.TemplateData.ExternalCallURL+"/"+cep.Value, nil)
 	if err != nil {
 		http.Error(w, "Invalid ExternalCallMethod", http.StatusBadRequest)
 		return
@@ -84,16 +91,28 @@ func (h *Webserver) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		var message string
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			message = "internal server error"
+		} else {
+			message = string(bodyBytes)
+		}
+		http.Error(w, message, resp.StatusCode)
+		return
+	}
+
 	var response MicroserviceClimateResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		http.Error(w, "Erro 2 "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
-		http.Error(w, "Erro 3 "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
